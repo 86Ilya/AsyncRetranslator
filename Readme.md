@@ -1,6 +1,9 @@
 # Retranslator
 This is a test work that demonstrates async features of python.
-![Basic structures of this application are demonstrated on picture below](structure.png)
+Basic structures of this application are demonstrated on picture below.
+
+![structure](structure.png "Structure")
+
 ### Prebuild
 To build this application you must install docker on your system
 ### Run tests
@@ -14,4 +17,4 @@ To demo run this application you should execeute the command in the project fold
 ```bash
 sudo ./demo.sh
 ```
-To stop application press <CTRL>+c
+To stop application press `<CTRL>+c`
