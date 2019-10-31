@@ -15,6 +15,6 @@ docker run -it testwork_retranslator pytest -v /app
 ### Run application
 To demo run this application you should execeute the command in the project folder:
 ```bash
-sudo ./demo.sh
+sudo bash ./demo.sh
 ```
 To stop application press `<CTRL>+c`
