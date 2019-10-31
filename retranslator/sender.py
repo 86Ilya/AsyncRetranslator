@@ -27,7 +27,6 @@ def create_handler(cfg):
 async def sender(cfg):
     ip, port = cfg["SENDER"]["IP"], cfg["SENDER"]["PORT"]
     handler = create_handler(cfg)
-    # import pdb; pdb.set_trace()
     server = await asyncio.start_server(
         handler, ip, port)
 

@@ -33,7 +33,6 @@ async def register_consumer(parsed_message, consumer_stream, consumer_default_po
 
 
 async def dispatch_message_to_one_consumer(message, consumer_addr):
-    # _, writer = await asyncio.open_connection(*consumer_addr)
     async with SafeConnect(consumer_addr) as stream:
         _, writer = stream
         writer.write(message)
@@ -85,17 +84,6 @@ def create_handler(cfg, consumers):
 
         raise UnknownMessage(parsed_message)
 
-        # message = data.decode()
-        # addr = writer.get_extra_info('peername')
-
-        # print(f"Received {message!r} from {addr!r}")
-
-        # print(f"Send: {message!r}")
-        # writer.write(data)
-        # await writer.drain()
-
-        # print("Close the connection")
-        # writer.close()
     return handle_message
 
 

@@ -59,7 +59,6 @@ async def consumer(cfg):
     message = json.dumps({"REGISTER_CONSUMER": {"CONSUMER_ID": id}})
     writer.write(message.encode())
     answer = await reader.read(m_size)
-    # import pdb; pdb.set_trace()
 
     writer.close()
     if not json.loads(answer).get("RESULT", False):
