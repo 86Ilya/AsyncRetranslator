@@ -1,0 +1,54 @@
+version: '2.0'
+
+services:
+   retranslator:
+    build:
+         context: .
+         dockerfile: ./docker/Dockerfile
+    command: python /app/retranslator/main.py 
+    expose:
+      - "7777"
+      - "8888"
+
+   consumer1:
+    build:
+         context: .
+         dockerfile: ./docker/Dockerfile
+    command: python /app/retranslator/demo/demo_consumer.py 
+    environment:
+       - CONSUMERID=1
+    depends_on:
+      - retranslator
+
+   consumer2:
+    build:
+         context: .
+         dockerfile: ./docker/Dockerfile
+    command: python /app/retranslator/demo/demo_consumer.py 
+    environment:
+       - CONSUMERID=2
+    depends_on:
+      - retranslator
+
+   # this consumer won't work
+   consumer3:
+    build:
+         context: .
+         dockerfile: ./docker/Dockerfile
+    command: python /app/retranslator/demo/demo_consumer.py 
+    environment:
+       - CONSUMERID=3
+    depends_on:
+      - retranslator
+
+   spamer:
+    build:
+         context: .
+         dockerfile: ./docker/Dockerfile
+    command: python /app/retranslator/demo/demo_spamer.py 
+    depends_on:
+      - consumer1
+      - consumer2
+      - consumer3
+    environment:
+       - PYTHONPATH=/app/
