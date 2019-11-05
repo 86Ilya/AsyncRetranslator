@@ -11,8 +11,6 @@ default_cfg = {
     "LOGFILE": None,
     "LOG_FORMAT": "%(asctime)s %(levelname).1s %(message)s",
     "LOG_DATEFMT": "%Y.%m.%d,%H:%M:%S",
-    "RECONNECT_ATTEMPTS": 3,
-    "RECONNECT_WAIT": 5,
     "SENDER": {"HOST": "retranslator", "PORT": 7777}
 }
 
@@ -22,14 +20,15 @@ messages = ["ASDF", "Русские буквы", "Smiles😀😁😂😃😄😅
 
 async def spamer(cfg):
 
-    # each time create new connection
-    for message in messages:
-        # make pause for visibility
-        await asyncio.sleep(2)
-        async with SafeConnect(tuple(cfg["SENDER"].values())) as stream:
-            _, writer = stream
-            writer.write(json.dumps({"RETRANSLATE_MESSAGE": message}).encode())
+    async with SafeConnect(tuple(cfg["SENDER"].values())) as stream:
+        _, writer = stream
+        writer.write((json.dumps({"RETRANSLATE_MESSAGE": messages})).encode())
+        await writer.drain()
 
+    async with SafeConnect(tuple(cfg["SENDER"].values())) as stream:
+        _, writer = stream
+        writer.write((json.dumps({"RETRANSLATE_MESSAGE": messages[::-1]})).encode())
+        await writer.drain()
 
 if __name__ == '__main__':
     asyncio.run(spamer(default_cfg))

@@ -5,7 +5,7 @@ Basic structures of this application are demonstrated on picture below.
 ![structure](structure.png "Structure")
 
 ### Prebuild
-To build this application you must install docker on your system
+To build this application you must install docker and docker-compose on your system
 ### Run tests
 To run the tests, you need to execute the following commands
 ```bash

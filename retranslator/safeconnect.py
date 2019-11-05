@@ -24,4 +24,5 @@ class SafeConnect:
             raise Exception(exc)
         else:
             self.writer.close()
+            await self.writer.wait_closed()
             return True

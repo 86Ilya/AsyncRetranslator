@@ -16,9 +16,9 @@ default_cfg = {
     "RECEIVER": {"IP": "0.0.0.0", "PORT": 8888},
     "MAX_MESSAGE_SIZE": 1024,
     "CONSUMERS_WHITE_LIST": [1, 2, 4],
-    "RECONNECT_ATTEMPTS": 3,
-    "RECONNECT_WAIT": 5,
-    "CONSUMER_DEFAULT_PORT": 6666
+    "TCP_IDLE_SEC": 2,
+    "TCP_INTERVAL_SEC": 10,
+    "TCP_MAX_RECONNECT_FAILS": 1
 }
 
 
@@ -55,10 +55,8 @@ async def main(cfg):
     logging.basicConfig(filename=cfg["LOGFILE"], level=cfg["LOGLEVEL"],
                         format=cfg["LOG_FORMAT"], datefmt=cfg["LOG_DATEFMT"])
 
-    sender_task = asyncio.create_task(sender(cfg))
     asyncio.create_task(receiver(cfg))
-
-    await sender_task
+    await asyncio.create_task(sender(cfg))
 
 
 if __name__ == '__main__':

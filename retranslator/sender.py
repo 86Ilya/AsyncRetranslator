@@ -5,31 +5,38 @@ import asyncio
 logger = logging.getLogger()
 
 
-def create_handler(cfg):
-    receiver_ip = cfg["RECEIVER"]["IP"]
-    receiver_port = cfg["RECEIVER"]["PORT"]
-    m_size = cfg["MAX_MESSAGE_SIZE"]
+class CreateHandler:
+    connection = dict()
 
-    async def handle_message(reader, writer):
-        # read message
-        message = await reader.read(m_size)
-        logger.info(f"Sender got a message {message.strip().decode('utf-8')}")
+    def __init__(self, cfg):
+        self.receiver_writer = None
+        self.receiver_stream = None
+        self.receiver_ip = cfg["RECEIVER"]["IP"]
+        self.receiver_port = cfg["RECEIVER"]["PORT"]
+        self.m_size = cfg["MAX_MESSAGE_SIZE"]
 
-        # send message to receiver
-        _, receiver_writer = await asyncio.open_connection(receiver_ip, receiver_port)
-        receiver_writer.write(message)
-        await receiver_writer.drain()
-        receiver_writer.close()
+    async def __call__(self, reader, writer):
+        if self.receiver_stream not in self.connection.keys():
+            self.receiver_stream = await asyncio.open_connection(self.receiver_ip, self.receiver_port)
+            self.connection.update({self.receiver_ip: self.receiver_stream})
+        _, receiver_writer = self.connection[self.receiver_ip]
 
-    return handle_message
+        while True:
+            # read message. for high load it's better to use memoryview
+            message = await reader.read(self.m_size)
+            if not message:
+                logger.info("Sender received empty message. Waiting for next block.")
+                break
+            logger.info(f"Sender got a message {bytes(message).decode('utf-8')}")
+
+            receiver_writer.write(message)
+            await receiver_writer.drain()
 
 
 async def sender(cfg):
     ip, port = cfg["SENDER"]["IP"], cfg["SENDER"]["PORT"]
-    handler = create_handler(cfg)
-    server = await asyncio.start_server(
-        handler, ip, port)
-
+    handler = CreateHandler(cfg)
+    server = await asyncio.start_server(handler, ip, port)
     addr = server.sockets[0].getsockname()
     logger.info(f'Sender Serving on {addr}')
 

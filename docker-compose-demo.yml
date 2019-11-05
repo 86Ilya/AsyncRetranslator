@@ -17,6 +17,7 @@ services:
     command: python /app/retranslator/demo/demo_consumer.py 
     environment:
        - CONSUMERID=1
+       - PYTHONPATH=/app/
     depends_on:
       - retranslator
 
@@ -27,6 +28,7 @@ services:
     command: python /app/retranslator/demo/demo_consumer.py 
     environment:
        - CONSUMERID=2
+       - PYTHONPATH=/app/
     depends_on:
       - retranslator
 
@@ -38,6 +40,7 @@ services:
     command: python /app/retranslator/demo/demo_consumer.py 
     environment:
        - CONSUMERID=3
+       - PYTHONPATH=/app/
     depends_on:
       - retranslator
 
