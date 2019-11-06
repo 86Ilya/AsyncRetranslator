@@ -42,6 +42,11 @@ class MessageDispatcher:
             consumer_writer.write(message.encode())
             await consumer_writer.drain()
 
+    async def close_connections(self):
+        for consumer_writer in self.consumers.values():
+            consumer_writer.close()
+            await consumer_writer.wait_closed()
+
 
 def create_handler(cfg, router):
     m_size = cfg["MAX_MESSAGE_SIZE"]
@@ -101,5 +106,16 @@ async def receiver(cfg):
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, cfg["TCP_MAX_RECONNECT_FAILS"])
     logging.info(f"Receiver serving on {addr}")
 
-    async with server:
-        await server.serve_forever()
+    try:
+        loop = asyncio.get_event_loop()
+        async with server:
+            await server.serve_forever()
+    except Exception:
+        pass
+    finally:
+        # restart loop on exception
+        if not loop.is_running:
+            loop.run_forever()
+        await dispatcher.close_connections()
+        await server.wait_closed()
+        logger.info("Receiver closed connections")

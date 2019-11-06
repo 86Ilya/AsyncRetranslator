@@ -32,6 +32,10 @@ class CreateHandler:
             receiver_writer.write(message)
             await receiver_writer.drain()
 
+    async def close_connections(self):
+        for _, writer in self.connection.values():
+            writer.close()
+
 
 async def sender(cfg):
     ip, port = cfg["SENDER"]["IP"], cfg["SENDER"]["PORT"]
@@ -40,5 +44,16 @@ async def sender(cfg):
     addr = server.sockets[0].getsockname()
     logger.info(f'Sender Serving on {addr}')
 
-    async with server:
-        await server.serve_forever()
+    try:
+        loop = asyncio.get_event_loop()
+        async with server:
+            await server.serve_forever()
+    except Exception:
+        pass
+    finally:
+        # restart loop on exception
+        if not loop.is_running:
+            loop.run_forever()
+        await handler.close_connections()
+        await server.wait_closed()
+        logger.info("Sender closed connections")

@@ -55,8 +55,11 @@ async def main(cfg):
     logging.basicConfig(filename=cfg["LOGFILE"], level=cfg["LOGLEVEL"],
                         format=cfg["LOG_FORMAT"], datefmt=cfg["LOG_DATEFMT"])
 
-    asyncio.create_task(receiver(cfg))
-    await asyncio.create_task(sender(cfg))
+    try:
+        tasks = asyncio.gather(asyncio.create_task(receiver(cfg)), asyncio.create_task(sender(cfg)))
+        await tasks
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        tasks.cancel()
 
 
 if __name__ == '__main__':
